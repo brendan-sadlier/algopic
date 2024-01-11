@@ -1,0 +1,75 @@
+html {
+    height: 100%;
+    background-color: #424242;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.home-container {
+    font-family: 'Bungee', sans-serif;
+    text-align: center;
+    flex-direction: column;
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+}
+
+.footer {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    text-align: center;
+    color: white;
+}
+
+.github-link {
+    color: #ED1C24;
+}
+
+.create-button {
+    font-family: 'Bungee', sans-serif;
+    font-size: 1rem;
+    background-color: #39B54A;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    box-shadow: 0px 3px 0px 0px #191919;
+}
+
+.create-button:hover {
+    background-color: #008B43;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.join-button {
+    font-family: 'Bungee', sans-serif;
+    font-size: 1rem;
+    background-color: #00AEEF;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    box-shadow: 0px 3px 0px 0px #191919;
+}
+
+.join-button:hover {
+    background-color: #0072BC;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.title-image {
+    height: 30%;
+    width: 30%;
+    margin-bottom: 20px;
+}
