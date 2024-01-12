@@ -1,0 +1,67 @@
+.create-game-container {
+  font-family: 'Bungee', sans-serif;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.create-game-title {
+  font-size: 3rem;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+.create-game-form {
+    width: 300px;
+    text-align: center;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.player-name-input, .create-game-button {
+    width: 100%;
+    padding: 10px;
+    margin: 5px, 0;
+    box-sizing: border-box;
+    text-align: center;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Bungee', sans-serif;
+    border: none;
+}
+
+.player-name-input:placeholder-shown {
+    border: #bcbcbc 2px solid;
+    color: #bcbcbc;
+}
+
+.player-name-input {
+    border: #bcbcbc 2px solid;
+    color: #272727;
+}
+
+.player-name-input:focus {
+    border: #272727 2px solid;
+    color: #272727;
+}
+
+
+.create-game-button {
+    background-color: #39B54A;
+    border: none;
+    color: white;
+    margin-top: 10px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0px 3px 0px 0px #191919;
+}
+
+.create-game-button:hover {
+    background-color: #008B43;
+    box-shadow: none;
+}

@@ -1,0 +1,89 @@
+.game-lobby-container {
+    font-family: 'Bungee', sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.game-lobby-title {
+    font-size: 50px;
+    font-family: 'Bungee', sans-serif;
+    color: white;
+    margin: 0;
+}
+
+.game-code-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 10px;
+    box-shadow: 10px 10px  (0, 0, 0, 0.5);
+}
+
+.game-lobby-code {
+    font-size: 30px;
+    font-family: 'Bungee', sans-serif;
+    color: #008B43;
+    margin: 0;
+}
+
+.host-title {
+    font-size: 20px;
+    color: #00aeef;
+    margin-top: 5px !important;
+    margin: 0;
+
+}
+
+.game-lobby-players {
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    list-style: none;
+}
+
+.players-title {
+    font-size: 20px;
+    color: #F7941d;
+    margin-bottom: 2px;
+    text-decoration: underline;
+}
+
+li {
+    margin: 0 10px;
+    font-size: 18px;
+    color: #F89E32;
+}
+
+.start-game-button {
+    font-family: 'Bungee', sans-serif;
+    font-size: 15px;
+    background-color: #F5B400;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    cursor: pointer;
+    width: 200px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    box-shadow: 0px 3px 0px 0px #191919;
+}
+
+.start-game-button:hover {
+    background-color: #CC9600;
+    box-shadow: none;
+}
+
+.start-game-button:disabled {
+    background-color: #6d6d6d;
+    box-shadow: none;
+    cursor: not-allowed;
+    
+}

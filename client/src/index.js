@@ -5,8 +5,13 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 // Components
 import Home from './components/Home/Home';
+import CreateGame from './components/CreateGame/CreateGame';
+import JoinGame from './components/JoinGame/JoinGame';
+import UploadPage from './components/UploadPage/UploadPage';
+import GameLobby from './components/GameLobby/GameLobby';
+import GamePage from './components/GamePage/GamePage';
 
-// Unregistering service workers
+// Unregister service workers
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.ready.then(registration => {
     registration.unregister();
@@ -20,6 +25,11 @@ root.render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/create-game" element={<CreateGame />} />
+      <Route path="/join-game" element={<JoinGame />} />
+      <Route path="/game/:gameCode/upload-images" element={<UploadPage />} />
+      <Route path="/game/:gameCode/lobby" element={<GameLobby />} />
+      <Route path="/game/:gameCode/start" element={<GamePage />} />
     </Routes>
   </BrowserRouter>
 );

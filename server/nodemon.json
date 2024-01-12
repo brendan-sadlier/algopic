@@ -1,0 +1,5 @@
+{
+    "ignore": ["uploads/*", "game-data.json"],
+    "watch": ["*.js"],
+    "ext": "js,json"
+  }  
