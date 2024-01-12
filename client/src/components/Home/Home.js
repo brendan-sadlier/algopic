@@ -21,7 +21,7 @@ const Home = () => {
         <div className="home-container">
 
             <div className="home-title">
-                <img className='title-image' src={process.env.PUBLIC_URL + 'AlgoPic.png'} />
+                <img className='title-image' src={process.env.PUBLIC_URL + 'AlgoPic.png'}/>
             </div>
 
             <div className='button-container'>

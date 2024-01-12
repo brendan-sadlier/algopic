@@ -29,18 +29,16 @@ const storage = multer.diskStorage({
     }
 });
 
-app.use(express.static(path.join(__dirname, ('uploads'))));
-app.use((req, res, next) => {
-    console.log('Request URL:', req.originalUrl);
-    next();
-  });
-
 const upload = multer({ storage: storage });
+
+app.use('/uploads', express.static('uploads'))
 
 app.get('/game-data', (req, res) => {
 
-    const filePath = path.join(__dirname, 'game-data.json');
-    fs.readFileSync(filePath, 'utf8', (err, data) => {
+    const filePath = 'game-data.json';
+    console.log('Game data file path: ', filePath);
+    fs.readFile(filePath, 'utf8', (err, data) => {
+    console.log('Reading game data from file');
 
         if (err) {
             console.log('Error reading game data: ', err);
@@ -151,6 +149,10 @@ const processImageWithGPT4Vision = async (filePath, prompt) => {
 
 };
 
+app.use((req, res, next) => {
+    console.log('Request URL:', req.originalUrl);
+    next();
+  });
 
 
 
@@ -228,13 +230,14 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Start Game Listener
     socket.on('startGame', ({ gameCode }) => {
         console.log(`Starting game ${gameCode}`);
-        // Add code to start the game
-        startGameTimer(gameCode);
+        // startGameTimer(gameCode); // TODO: Implement game timer
         io.to(gameCode).emit('gameStarting', gameCode);
     });
 
+    // Update Score Listener
     socket.on('updateScore', ({ username, gameCode, pointsEarned }) => {
         if (gameLobbies[gameCode] && gameLobbies[gameCode].scores[username] !== undefined) {
             gameLobbies[gameCode].scores[username] += pointsEarned;
@@ -275,6 +278,11 @@ io.on('connection', (socket) => {
                 break;
             }
         }
+
+        // // Stop the timer if no players are left in the game
+        // if (games[gameCode] && games[gameCode].players.length === 0) {
+        //     clearInterval(gameTimers[gameCode]);
+        // }
 
         socket.removeAllListeners();
         console.log("Player disconnected", socket.username);

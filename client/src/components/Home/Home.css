@@ -14,12 +14,14 @@ html {
     display: flex;
     justify-content: space-between;
     height: 100%;
+    width: 100%;
 }
 
 .button-container {
     display: flex;
     justify-content: center;
     gap: 50px;
+    width: 100%;
 }
 
 .footer {
