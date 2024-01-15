@@ -13,9 +13,10 @@
     justify-content: center;
     align-items: center;
   }
-
+  
   .modal-content {
     background-color: white;
+    color: black;
     margin: auto;
     padding: 20px;
     border: 1px solid #888;
@@ -23,13 +24,17 @@
     max-width: 500px; /* Adjust as needed */
   }
 
-  .scores-title {
-    background-color: #0072BC;
+  .leave-game-title {
+    background-color: #F7941D;
     padding: 10px;
     color: white;
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 10px;
+  }
+
+  .username {
+    color: #008B43
   }
 
   .countdown {
@@ -42,3 +47,4 @@
     padding-right: 10px;
     border-radius: 10px;
   }
+  

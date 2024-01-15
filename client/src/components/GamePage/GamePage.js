@@ -5,11 +5,14 @@ import { socket } from '../Socket'
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 
 import RoundOverModal from "./RoundOverModal";
+import LeaveGameModal from "./LeaveGameModal";
 
 // Styles
 import "./GamePage.css";
 
 const GamePage = () => {
+
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
 
     const { gameCode } = useParams();
     const location = useLocation();
@@ -39,6 +42,8 @@ const GamePage = () => {
     const [message, setMessage] = useState("");
     const [animationWrong, setAnimationWrong] = useState(false);
     const [timerFlash, setTimerFlash] = useState(false);
+
+    const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
 
     useEffect(() => {
 
@@ -197,25 +202,35 @@ const GamePage = () => {
         }
     }
 
-    const handleLeaveGame = () => {
-        socket.emit("leaveGameInitiated", { username, gameCode })
+    const handleRedirectCountdown = () => {
+        navigate('/');
     }
 
-    // // Listen for the leave game event
-    // useEffect(() => {
-    //     socket.on("leaveGame", ({ username, gameCode }) => {
+    const handleLeaveGame = () => {
+        socket.emit("leaveGameInitiated", { username, gameCode })
 
-    //         alert(`${username} has left the game! Redirecting in 5 seconds...`);
+        // Make a request to the server to remove the user from the game
+        axios.get(`${backendUrl}/delete-files`)
+        .then(response => {
+            console.log(response);
+        })
+        .catch(error => {
+            console.log("Error deleting files", error);
+        });
+    };
 
-    //         setTimeout(() => {
-    //             navigate(`/`);
-    //         }, 5000)
-    //     });
+    // Listen for the leave game event
+    useEffect(() => {
+        socket.on("leaveGame", ({ username, gameCode }) => {
 
-    //     return () => {
-    //         socket.off("leaveGame");
-    //     }
-    // }, []);
+            console.log("Leave Game Event Received");
+            setShowLeaveGameModal(true);
+        });
+
+        return () => {
+            socket.off("leaveGame");
+        }
+    }, [navigate, username]);
 
 
     if (gameData.length === 0) {
@@ -236,7 +251,7 @@ const GamePage = () => {
                 <div className={`info-item timer ${timer <= 10 ? 'flash-animation' : ''}`}>{timer}s</div>
                 <div className={`info-item score ${isCorrect ? 'correct-guess' : ''}`}>Score: {score}</div>
                 <div className="info-item round">Round: {currentImageIndex+1}</div>
-                <button className="info-item leave">Leave Game</button>
+                <button className="info-item leave" onClick={handleLeaveGame}>Leave Game</button>
             </div>
 
             <div className="image-container">
@@ -285,6 +300,13 @@ const GamePage = () => {
                 countdown={modalData.countdown}
                 onClose={closeModal}
             />
+
+            <LeaveGameModal 
+                isVisible={showLeaveGameModal}
+                countdown={5}
+                username={username}
+                onCountdownEnd={handleRedirectCountdown}
+                />
 
         </div>
     )

@@ -90,6 +90,46 @@ app.post('/upload', upload.array('images'), async (req, res) => {
     }
 });
 
+app.get('/delete-files', (req, res) => {
+
+    // Define the paths
+    const uploadsPath = './uploads';
+    const gameDataPath = './game-data.json';
+
+    // Delete All files in the uploads directory
+    fs.readdir(uploadsPath, (err, files) => {
+
+        if (err) {
+            return res.status(500).send('Error reading uploads directory');
+        }
+
+        files.forEach(file => {
+
+            fs.unlink(path.join(uploadsPath, file), err => {
+
+                if (err) {
+                    console.error('Error deleting file: ', err);
+                    return res.status(500).send('Error deleting files in uploads directory');
+                }
+
+            });
+        });
+    });
+
+    // Delete the game-data.json file
+    fs.unlink(gameDataPath, err => {
+
+        if (err) {
+            console.log('Error deleting game-data.json file: ', err);
+            return res.status(500).send('Error deleting game-data.json file');
+        }
+    });
+
+
+    res.send('Success deleting files');
+    console.log('Success deleting files');
+})
+
 const processImageWithGPT4Vision = async (filePath, prompt) => {
 
     try {
@@ -244,7 +284,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('leaveGameInitiated', ({ username, gameCode }) => {
-        io.to(gameCode).emit('playerLeft', { username, gameCode });
+        io.to(gameCode).emit('leaveGame', { username, gameCode });
+        console.log(`Player ${username} ended game ${gameCode}`);
+        delete gameLobbies[gameCode];
+        console.log(`${gameCode} deleted`);
     })
 
     socket.on('resetGame', ({ gameCode }) => {
