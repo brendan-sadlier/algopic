@@ -1,10 +1,8 @@
 const express = require('express');
-const app = express();
-
+const multer = require('multer');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-
 const fs = require('fs');
 const path = require('path');
 
@@ -13,8 +11,7 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const multer = require('multer');
-
+const app = express();
 app.use(cors());
 
 // Image Uploads
@@ -67,7 +64,6 @@ app.post('/upload', upload.array('images'), async (req, res) => {
             console.log('File path: ', filePath);
             const labels = await processImageWithGPT4Vision(filePath, 
                 "Generate 20 one word objects in this image without any explanations in the form [1. Object One - <Score>]. Give a score for each object from 1 to 10, where 1 is the easiest object to guess and 10 is the hardest to guess.");
-            console.log('Labels: ', labels);
             newResults.push({ path: 'uploads/' + fileOriginalName, labels });
         }
 
@@ -233,7 +229,7 @@ io.on('connection', (socket) => {
     // Start Game Listener
     socket.on('startGame', ({ gameCode }) => {
         console.log(`Starting game ${gameCode}`);
-        // startGameTimer(gameCode); // TODO: Implement game timer
+        startGameTimer(gameCode);
         io.to(gameCode).emit('gameStarting', gameCode);
     });
 
@@ -247,25 +243,29 @@ io.on('connection', (socket) => {
         }
     });
 
-    // socket.on('resetGame', ({ gameCode }) => {
+    socket.on('leaveGameInitiated', ({ username, gameCode }) => {
+        io.to(gameCode).emit('playerLeft', { username, gameCode });
+    })
 
-    //     // Notify client or handle errors as needed
-    //     io.to(gameCode).emit('redirectHome');
+    socket.on('resetGame', ({ gameCode }) => {
 
-    //     // Clear the uploads directory
-    //     const uploadsPath = path.join(__dirname, 'public', 'uploads');
-    //     console.log(`Attempting to clear uploads directory: ${uploadsPath}`)
-    //     deleteFilesInDirectory(uploadsPath);
+        // Notify client or handle errors as needed
+        io.to(gameCode).emit('redirectHome');
 
-    //     // Delete the results.json file
-    //     const resultsFilePath = path.join(__dirname, 'results.json');
-    //     if (fs.existsSync(resultsFilePath)) {
-    //         fs.unlinkSync(resultsFilePath);
-    //         console.log('results.json deleted.');
-    //     } else {
-    //         console.log('results.json does not exist.');
-    //     }
-    // });
+        // Clear the uploads directory
+        const uploadsPath = './uploads';
+        console.log(`Attempting to clear uploads directory: ${uploadsPath}`)
+        // deleteFilesInDirectory(uploadsPath); // TODO: Implement this function
+
+        // Delete the results.json file
+        const resultsFilePath = './game-data.json';
+        if (fs.existsSync(resultsFilePath)) {
+            fs.unlinkSync(resultsFilePath);
+            console.log('game-data.json deleted.');
+        } else {
+            console.log('game-data.json does not exist.');
+        }
+    });
 
 
     // Disconnect Listener
@@ -279,10 +279,10 @@ io.on('connection', (socket) => {
             }
         }
 
-        // // Stop the timer if no players are left in the game
-        // if (games[gameCode] && games[gameCode].players.length === 0) {
-        //     clearInterval(gameTimers[gameCode]);
-        // }
+        // Stop the timer if no players are left in the game
+        if (games[gameCode] && games[gameCode].players.length === 0) {
+            clearInterval(gameTimers[gameCode]);
+        }
 
         socket.removeAllListeners();
         console.log("Player disconnected", socket.username);
@@ -291,6 +291,89 @@ io.on('connection', (socket) => {
     });
 
 });
+
+let gameTimers = {};
+
+function startGameTimer(gameCode) {
+    let timeLeft = 60;
+
+    gameTimers[gameCode] = setInterval(() => {
+        timeLeft--;
+        io.to(gameCode).emit('timerUpdate', timeLeft);
+    
+        if (timeLeft <= 0) {
+          clearInterval(gameTimers[gameCode]);
+          moveToNextRound(gameCode); // Move to the next round
+        }
+      }, 1000); 
+}
+
+// Function to calculate the score for a player
+function calculateScoreForAllPlayers(gameCode) {
+    const scores = {};
+
+    // Assuming each game in 'games' has a 'scores' object with player names as keys and their scores as values
+    if (gameLobbies[gameCode] && gameLobbies[gameCode].scores) {
+        Object.keys(gameLobbies[gameCode].scores).forEach(player => {
+            scores[player] = gameLobbies[gameCode].scores[player];
+        });
+    }
+
+    return scores;
+}
+
+// Move to next round logic
+function moveToNextRound(gameCode) {
+    if (gameLobbies[gameCode]) {
+
+        gameLobbies[gameCode].currentImageIndex++;
+
+        // Fetch the game data for the next image
+        const gameData = require('./game-data.json');
+        console.log(`Game ${gameCode} - Moving to image index: ${gameLobbies[gameCode].currentImageIndex}`);
+
+        if (gameLobbies[gameCode].currentImageIndex >= gameData.length) {
+            // End of the game
+            console.log(`Game ${gameCode} - Game Over`);
+            io.to(gameCode).emit('gameOver', {
+                scores: calculateScoreForAllPlayers(gameCode),
+                winner: calculateWinner(gameLobbies[gameCode].scores)
+            
+            });
+
+            delete gameLobbies[gameCode];
+        } else {
+
+            // Emit the roundEnded event with scores and countdown
+            io.to(gameCode).emit('roundEnded', {
+                scores: calculateScoreForAllPlayers(gameCode),
+                nextRoundStartsIn: 5 // 5 seconds until next round
+            });
+
+            console.log(gameLobbies[gameCode]);
+
+            setTimeout(() => {
+                startGameTimer(gameCode);
+                io.to(gameCode).emit('nextRound', gameLobbies[gameCode].currentImageIndex);
+                io.to(gameCode).emit('startNewRound');
+            }, 5000) // Wait 10 seconds before starting the next round
+        }
+    }
+}
+
+function calculateWinner(scores) {
+    let winner = null;
+    let highestScore = 0;
+
+    Object.keys(scores).forEach(player => {
+        if (scores[player] > highestScore) {
+            winner = player;
+            highestScore = scores[player];
+        }
+    });
+
+    return winner;
+}
 
 // Helper Functions
 const generateNewGameCode = () => {

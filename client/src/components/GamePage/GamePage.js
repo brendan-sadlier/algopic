@@ -4,6 +4,8 @@ import { socket } from '../Socket'
 
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 
+import RoundOverModal from "./RoundOverModal";
+
 // Styles
 import "./GamePage.css";
 
@@ -22,13 +24,21 @@ const GamePage = () => {
 
     // Game States
     const [gameData, setGameData] = useState([]);
-    const [currentImage, setCurrentImage] = useState(0);
-    const [nextImage, setNextImage] = useState(null);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [nextImageIndex, setNextImageIndex] = useState(null);
     const [currentGuess, setCurrentGuess] = useState("");
     const [previousGuesses, setPreviousGuesses] = useState([]);
     const [score, setScore] = useState(0);
-    const [timer, setTimer] = useState(20);
+    const [timer, setTimer] = useState(60);
     const [currentRound, setCurrentRound] = useState(0);
+
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [modalData, setModalData] = useState({ scores: {}, countdown: 5 });
+
+    const [isCorrect, setIsCorrect] = useState(false);
+    const [message, setMessage] = useState("");
+    const [animationWrong, setAnimationWrong] = useState(false);
+    const [timerFlash, setTimerFlash] = useState(false);
 
     useEffect(() => {
 
@@ -50,48 +60,133 @@ const GamePage = () => {
     }, []);
 
 
-    // TODO: Update Timer
-    // useEffect(() => {}, []);
+    useEffect(() => {
+
+        let timerInterval;
+
+        socket.on("timerUpdate", (timeLeft) => {
+
+            setTimer(timeLeft);
+
+            if (timeLeft <= 10) {
+                timerInterval = setInterval(() => {
+                    setTimerFlash(prevState => !prevState);
+                }, 500);
+            } else {
+                setTimerFlash(false);
+            }
+
+        })
+
+        // Listener to move to the next round
+        socket.on("nextRound", (newImageIndex) => {
+
+            // if (!isModalVisible) {
+            //     setCurrentImageIndex(newImageIndex);
+            //     setIsModalVisible(true);
+            //     setPreviousGuesses([]);
+            //     setTimer(60);
+            // } else {
+            //     setNextImageIndex(newImageIndex);
+            // }
+
+            setCurrentImageIndex(newImageIndex);
+            setIsModalVisible(true);
+            setPreviousGuesses([]);
+            setTimer(60); // Reset timer here for the new round
+
+        });
+
+        socket.on("startNewRound", () => {
+            setIsModalVisible(false);
+            setTimer(60);
+        })
+
+        // Listener to move to end game
+        socket.on('gameOver', ({ scores, winner }) => {
+            console.log('Game Over received', scores, winner);
+            navigate(`/game/${gameCode}/game-over`, { state: { scores, winner } })
+          });
+
+          // Round Ended Listener
+        socket.on('roundEnded', ({ scores , nextRoundStartsIn }) => {
+            setModalData({ scores, countdown: nextRoundStartsIn });
+            setIsModalVisible(true);
+          });
+
+          return () => {
+            socket.off('timerUpdate');
+            socket.off('nextRound');
+            socket.off('roundEnded');
+            socket.off('gameOver');
+          };
+
+    }, [isModalVisible, gameCode, navigate]);
+
+    const closeModal = () => {
+        setIsModalVisible(false);
+  
+        if (nextImageIndex !== null) {
+          setCurrentImageIndex(nextImageIndex);
+          setCurrentRound(currentRound + 1);
+          setNextImageIndex(null);
+          setPreviousGuesses([]);
+        }
+      }
 
     const handleGuessSubmit = () => {
 
         // Check if the guess matches any object from the game-data
-        const currentImageObjects = gameData[currentImage]?.labels || [];
+        const lowerCaseGuess = currentGuess.toLowerCase();
+        const currentImageObjects = gameData[currentImageIndex]?.labels || [];
 
         // Check there is a match
         // Convert labels and guesses to lowercase to make it case insensitive
-        const match = currentImageObjects.find((label => label.name.toLowerCase() === currentGuess.toLowerCase()));
+        const match = currentImageObjects.find(label => label.name.toLowerCase() === lowerCaseGuess);
 
-        if (previousGuesses.includes(currentGuess.toLowerCase())){
+        if (previousGuesses.includes(lowerCaseGuess)) {
             // Inform the user they have already guessed this
-            // TODO: Add a client side notification
-            setCurrentGuess("");
+            setMessage("You have already guessed this!");
+            setTimeout(() => setMessage(""), 2000);
+            setCurrentGuess('');
+            return;
         }
 
         if (match) {
 
             console.log("[MATCH FOUND] - Match Score:", match.score, "@", timer);
 
-            // TODO: Client Notification
+            setMessage("Correct!");
+            setIsCorrect(true);
+            setTimeout(() => setIsCorrect(false), 2000);
+            setTimeout(() => setMessage(''), 2000);
 
             const pointsEarned = match.score * timer * 10;
             console.log("Points Earned from match:", pointsEarned);
             setScore(score + pointsEarned);
 
             if (pointsEarned > 0) {
+
+                // Emit an event to the server to update the score
+
                 socket.emit("updateScore", { 
                     username: username, 
                     gameCode: gameCode, 
-                    score: pointsEarned 
+                    pointsEarned: pointsEarned 
                 });
             }
         } else {
 
-            // TODO: Client Notification of Wrong Guess
+            setMessage("Wrong Guess! Try Again");
+            setAnimationWrong(true);
+            setTimeout(() => {
+                setMessage("");
+                setAnimationWrong(false);
+            }, 1000)
 
         }
 
-        setPreviousGuesses(previousGuesses => [...previousGuesses, currentGuess]);
+        setPreviousGuesses(previousGuesses => [...previousGuesses, lowerCaseGuess]);
         setCurrentGuess("");
     }
 
@@ -101,6 +196,27 @@ const GamePage = () => {
             handleGuessSubmit();
         }
     }
+
+    const handleLeaveGame = () => {
+        socket.emit("leaveGameInitiated", { username, gameCode })
+    }
+
+    // // Listen for the leave game event
+    // useEffect(() => {
+    //     socket.on("leaveGame", ({ username, gameCode }) => {
+
+    //         alert(`${username} has left the game! Redirecting in 5 seconds...`);
+
+    //         setTimeout(() => {
+    //             navigate(`/`);
+    //         }, 5000)
+    //     });
+
+    //     return () => {
+    //         socket.off("leaveGame");
+    //     }
+    // }, []);
+
 
     if (gameData.length === 0) {
         return (
@@ -112,79 +228,23 @@ const GamePage = () => {
 
 
     return (
-        // <div className="game-container">
-            
-        //     <div className="game-header">
-        //         <div className="header-item timer">{timer}s</div>
-        //         <div className="header-item score">Score: {score}</div>
-        //         <div className="header-item">Round: {currentRound + 1}</div>
-        //     </div>
-
-        //     <div className="image-container">
-
-        //         {gameData.length > 0 && gameData[currentImage] &&
-        //             <img className={`responsive-image`} src={`http://localhost:3001/${gameData[currentImage].path}`} alt="Game" />
-        //         }
-
-        //     </div>
-
-                
-
-        //     <div className="guess-container">
-
-        //         <input
-        //             className="guess-input"
-        //             type="text" 
-        //             placeholder="Enter Guess"
-        //             value={currentGuess}
-        //             onChange={(event) => setCurrentGuess(event.target.value)}
-        //             onKeyPress={handleEnterKeyPress}
-        //         />
-
-        //         <button className="guess-button" onClick={handleGuessSubmit}>Guess</button>
-
-        //     </div>
-
-        //     <div className="prev-guess-container">
-
-        //         <div className="previous-guesses">
-
-        //             <div className="guesses-title">
-        //                 Already Guessed
-        //             </div>
-
-        //             <div className="guesses-list">
-
-        //                 {previousGuesses.map((guess, index) => (
-        //                     <div className="guess-item" key={index}>{guess}</div>
-        //                 ))}
-
-        //             </div>
-
-        //         </div>
-
-        //     </div>
-
-        //     {/* TODO: Add Round End Modal */}
-
-        // </div>
 
         <div className="main-container">
 
             <div className="game-info">
                 <div className="info-item player">{username}</div>
-                <div className="info-item timer">{timer}s</div>
-                <div className="info-item score">Score: {score}</div>
-                <div className="info-item round">Round: {currentRound+1}</div>
+                <div className={`info-item timer ${timer <= 10 ? 'flash-animation' : ''}`}>{timer}s</div>
+                <div className={`info-item score ${isCorrect ? 'correct-guess' : ''}`}>Score: {score}</div>
+                <div className="info-item round">Round: {currentImageIndex+1}</div>
                 <button className="info-item leave">Leave Game</button>
             </div>
 
             <div className="image-container">
 
-            <div className="message ">{}</div>
+            <div className={`message ${isCorrect ? 'correct' : ''}`}>{message}</div>
 
-                {gameData.length > 0 && gameData[currentImage] &&
-                    <img className={`responsive-image`} src={`http://localhost:3001/${gameData[currentImage].path}`} alt="Game" />
+                {gameData.length > 0 && gameData[currentImageIndex] &&
+                    <img className={`responsive-image ${animationWrong ? 'vibrate-animation' : ''}`} src={`http://localhost:3001/${gameData[currentImageIndex].path}`} alt="Game" />
                 }
 
 
@@ -218,6 +278,13 @@ const GamePage = () => {
                 </ul>
 
             </div>
+
+            <RoundOverModal 
+                isVisible={isModalVisible}
+                scores={modalData.scores}
+                countdown={modalData.countdown}
+                onClose={closeModal}
+            />
 
         </div>
     )

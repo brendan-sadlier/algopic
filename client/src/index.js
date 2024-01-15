@@ -10,6 +10,7 @@ import JoinGame from './components/JoinGame/JoinGame';
 import UploadPage from './components/UploadPage/UploadPage';
 import GameLobby from './components/GameLobby/GameLobby';
 import GamePage from './components/GamePage/GamePage';
+import GameOver from './components/GameOver/GameOver';
 
 // Unregister service workers
 if ('serviceWorker' in navigator) {
@@ -30,6 +31,7 @@ root.render(
       <Route path="/game/:gameCode/upload-images" element={<UploadPage />} />
       <Route path="/game/:gameCode/lobby" element={<GameLobby />} />
       <Route path="/game/:gameCode/start" element={<GamePage />} />
+      <Route path="/game/:gameCode/game-over" element={<GameOver />} />
     </Routes>
   </BrowserRouter>
 );

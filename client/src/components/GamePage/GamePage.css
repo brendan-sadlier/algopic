@@ -27,6 +27,7 @@
   padding-left: 15px;
   padding-right: 15px;
   border-radius: 10px;
+  width: 200px;
 }
 
 .info-item:first-child {
@@ -86,6 +87,7 @@
   overflow: hidden; /* Hide any overflow */
   padding: 10px; /* Padding for aesthetics */
   margin-top: 5px;
+  margin-left: 100px;
 }
 
 .responsive-image {
@@ -187,8 +189,39 @@
   text-align: center;
   margin-top: 2px;
   margin-bottom: 5px;
+  color: #ED1C24
 }
 
 .correct {
   color:#39B54A;
 }
+
+  /* Animations */
+  @keyframes scoreFlashAnimation {
+    0%, 100% { background-color: transparent; }
+    50% { background-color: #39B54A; }
+  }
+  
+  .correct-guess {
+    animation: scoreFlashAnimation 1s ease;
+  }
+
+  @keyframes flash {
+    0%, 100% { opacity: 1; background-color: #ED1C24}
+    50% { opacity: 0.2 }
+  }
+  
+  .flash-animation {
+    animation: flash 0.5s infinite;
+  }
+
+  @keyframes vibrate {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-4px); }
+  }
+  
+  .vibrate-animation {
+    animation: vibrate 0.2s linear;
+  }
