@@ -13,11 +13,16 @@ const GameOver = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const gameCode = useParams();
+    const { gameCode }  = useParams();
 
     const { scores, winner } = location.state || { scores: [], winner: '' };
 
-    const username = '';
+    function useQuery() {
+      return new URLSearchParams(useLocation().search);
+    }
+
+    const query = useQuery();
+    const username = query.get('username');
 
 
     const handleLeaveGame = () => {
@@ -32,14 +37,14 @@ const GameOver = () => {
           console.log("Error deleting files", error);
       });
 
-      navigate('/');
     };
 
       // Listen for the leave game event
       useEffect(() => {
         socket.on("leaveGame", ({ username, gameCode }) => {
 
-            console.log("Leave Game Event Received");
+          navigate('/');
+          console.log("Leave Game Event Received");
         });
 
         return () => {

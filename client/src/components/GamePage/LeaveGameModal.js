@@ -10,16 +10,22 @@ const LeaveGameModal = ({ isVisible, countdown, username, onCountdownEnd }) => {
 
         if (isVisible && timer > 0) {
             const intervalId = setInterval(() => {
-                setTimer((prevTimer) => prevTimer - 1);
+                setTimer((prevCountdown) => {
+                    if (prevCountdown > 1) return prevCountdown - 1;
+                    clearInterval(intervalId); // Clear interval when countdown finishes
+                    return 0;
+                });
             }, 1000);
 
             return () => clearInterval(intervalId);
         }
+    }, [isVisible, timer, onCountdownEnd]);
 
+    useEffect(() => {
         if (timer === 0) {
             onCountdownEnd();
         }
-    }, [isVisible, timer, onCountdownEnd]);
+    }, [timer, onCountdownEnd]);
 
     if (!isVisible) {
         return null;

@@ -290,26 +290,6 @@ io.on('connection', (socket) => {
         console.log(`${gameCode} deleted`);
     })
 
-    socket.on('resetGame', ({ gameCode }) => {
-
-        // Notify client or handle errors as needed
-        io.to(gameCode).emit('redirectHome');
-
-        // Clear the uploads directory
-        const uploadsPath = './uploads';
-        console.log(`Attempting to clear uploads directory: ${uploadsPath}`)
-        // deleteFilesInDirectory(uploadsPath); // TODO: Implement this function
-
-        // Delete the results.json file
-        const resultsFilePath = './game-data.json';
-        if (fs.existsSync(resultsFilePath)) {
-            fs.unlinkSync(resultsFilePath);
-            console.log('game-data.json deleted.');
-        } else {
-            console.log('game-data.json does not exist.');
-        }
-    });
-
 
     // Disconnect Listener
     socket.on('disconnect', () => {

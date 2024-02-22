@@ -110,7 +110,7 @@ const GamePage = () => {
         // Listener to move to end game
         socket.on('gameOver', ({ scores, winner }) => {
             console.log('Game Over received', scores, winner);
-            navigate(`/game/${gameCode}/game-over`, { state: { scores, winner } })
+            navigate(`/game/${gameCode}/game-over?username=${encodeURIComponent(username)}`, { state: { scores, winner } })
           });
 
           // Round Ended Listener
@@ -256,7 +256,7 @@ const GamePage = () => {
 
             <div className="image-container">
 
-            <div className={`message ${isCorrect ? 'correct' : ''}`}>{message}</div>
+                <div className={`message ${isCorrect ? 'correct' : ''}`}>{message}</div>
 
                 {gameData.length > 0 && gameData[currentImageIndex] &&
                     <img className={`responsive-image ${animationWrong ? 'vibrate-animation' : ''}`} src={`http://localhost:3001/${gameData[currentImageIndex].path}`} alt="Game" />
