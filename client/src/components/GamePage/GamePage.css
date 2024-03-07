@@ -1,10 +1,8 @@
 /* NEW CSS */
 
 .game-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: start;
+  max-width: 100%;
+  margin: 0 auto;
   padding: 20px;
 }
 
@@ -99,6 +97,7 @@
   justify-content: center;
   align-items: center;
   padding: 10px;
+  margin-right: 0px;
 }
 
 .game-image {
@@ -138,201 +137,6 @@
 
 .guess-submit:hover {
   background-color: #005328;
-}
-
-/* ==================================================================================================== */
-
-/* OLD CSS */
-
-.main-container {
-  display: flex;
-  height: calc(100vh - 40px);
-  width: 100%;
-  margin-top: 30px;
-}
-
-.image-guess-container {
-  flex: 3; /* Gives the image and guess field more room to grow */
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Center align the children vertically */
-}
-
-.game-info {
-  font-family: 'Bungee', sans-serif;
-  width: 100%;
-  position: fixed;
-  top: 0; /* Align to the top of the window */
-  left: 0; /* Align to the left of the window */
-  background-color: #f0f0f0; /* Background color */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Box shadow for a subtle depth */
-  z-index: 1000; /* Ensure it stays on top of other elements */
-  display: flex; /* Using flexbox for alignment */
-  justify-content: center; /* Center items horizontally */
-  align-items: center; /* Center items vertically */
-  padding: 5px; /* Padding for aesthetic spacing */
-  height: 40px;
-}
-
-.info-item {
-  font-size: 1rem; /* Font size for the text */
-  text-align: center; /* Center the text */
-  padding-left: 15px;
-  padding-right: 15px;
-  border-radius: 10px;
-  width: 200px;
-}
-
-.info-item:first-child {
-  margin-right: auto; /* Push the first item to the left */
-  margin-left: 20px;
-}
-
-.info-item:last-child {
-  margin-left: auto; /* Push the last item to the right */
-  margin-right: 20px;
-}
-
-.player {
-  background-color: #670dce;
-  color: white;
-}
-
-.timer {
-  background-color: #0072BC;
-  color: white;
-  margin-right: 20px;
-}
-
-.score {
-  background-color: #008B43;
-  color: white;
-  margin-right: 20px;
-}
-
-.round {
-  background-color: #F7941D;
-  color: white;
-  margin-right: 20px;
-}
-
-.leave {
-  background-color: #ED1C24;
-  font-family: 'Bungee', sans-serif;
-  color: white;
-  border: none;
-  padding-left: 15px;
-  padding-right: 15px;
-  cursor: pointer;
-}
-
-.leave:hover {
-  background-color: #881115;
-  box-shadow: none;
-  cursor: pointer;
-}
-
-.image-container {
-  width: 100%; /* Fixed width for the responsive container */
-  display: flex; /* Using flexbox */
-  flex-direction: column; /* Stack children vertically */
-  align-items: center; /* Center content horizontally */
-  overflow: hidden; /* Hide any overflow */
-  padding: 10px; /* Padding for aesthetics */
-  margin-top: 5px;
-  margin-left: 100px;
-}
-
-.responsive-image {
-  max-width: 100%; /* Image maximum width is 100% of its container */
-  max-height: 80%; /* Adjust the max height to leave space for the input area */
-  object-fit: contain; /* Ensure the entire image is always visible */
-  margin-bottom: 10px; /* Add some space between the image and the input area */
-  background-color: white;
-  margin-top: 25px;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-.guess-input-area {
-  align-items: center; /* Center content horizontally */
-}
-
-.guess-input {
-  padding: 10px; /* Padding for the text input */
-  margin-right: 10px; /* Space between the input and the button */
-  font-size: 1rem; /* Font size for the input */
-  border-radius: 10px; /* Rounded corners for the input */
-  border: 3px solid #008B43; /* Border for the input */
-}
-
-.guess-input:focus {
-  padding: 10px; /* Padding for the text input */
-  margin-right: 10px; /* Space between the input and the button */
-  font-size: 1rem; /* Font size for the input */
-  border-radius: 10px; /* Rounded corners for the input */
-  outline: none;
-}
-
-.guess-button {
-  font-family: 'Bungee', sans-serif;
-  padding-left: 10px;
-  padding-right: 10px;
-  font-size: 1rem; /* Font size for the button */
-  border-radius: 5px; /* Rounded corners for the button */
-  cursor: pointer; /* Pointer cursor on hover */
-  border: none; /* No border for the button */
-  background-color: #008B43; /* Background color for the button */
-  color: white; /* Text color for the button */
-}
-
-.prev-guess-panel {
-  font-family: 'Bungee', sans-serif;
-  width: 30%;
-  position: absolute;
-  left: 0;
-  margin-left: 10px;
-  top: 40px;
-  text-align: center;
-  align-items: center;
-  margin-top: 30px;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 5px rgba(0, 0, 0, 0.3);
-  height: calc(100vh - 90px); /* Adjust for padding */
-  overflow-y: auto;
-  background-color: #fff;
-}
-
-.prev-guess-title {
-  color: #0072BC;
-  font-size: 20px;
-}
-
-.previous-guesses {
-  max-height: 100%;
-  padding-left: 5px;
-  padding-right: 5px;
-  overflow: hidden;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  text-align: center;
-  align-items: center;
-  justify-content: center;
-  list-style: none;
-}
-
-.guess-item {
-  font-weight: 400;
-  font-size: medium;
-  white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  padding: 5px;
-  margin-bottom: 3px;
-  font-size: small;
-  color: black;
 }
 
 .message {
@@ -378,9 +182,13 @@
     animation: vibrate 0.2s linear;
   }
     
-    @media (max-width: 767px) {
-      /* For mobile */
-      .game-main {
-        flex-direction: column;
-      }
-    }
+@media (max-width: 767px) {
+  /* For mobile */
+  .game-container {
+    flex-direction: column;
+  }
+
+  .image-container, .guess-form {
+    width: 100%;
+  }
+}

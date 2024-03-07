@@ -153,6 +153,7 @@ const GamePage = () => {
         if (previousGuesses.includes(lowerCaseGuess)) {
             // Inform the user they have already guessed this
             setMessage("You have already guessed this!");
+            playWrong();
             setTimeout(() => setMessage(""), 2000);
             setCurrentGuess('');
             return;
