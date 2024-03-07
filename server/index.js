@@ -303,9 +303,9 @@ io.on('connection', (socket) => {
         }
 
         // Stop the timer if no players are left in the game
-        if (games[gameCode] && games[gameCode].players.length === 0) {
-            clearInterval(gameTimers[gameCode]);
-        }
+        // if (games[gameCode] && games[gameCode].players.length === 0) {
+        //     clearInterval(gameTimers[gameCode]);
+        // }
 
         socket.removeAllListeners();
         console.log("Player disconnected", socket.username);

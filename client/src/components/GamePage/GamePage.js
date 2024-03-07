@@ -7,6 +7,12 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import RoundOverModal from "./RoundOverModal";
 import LeaveGameModal from "./LeaveGameModal";
 
+import Confetti from "react-confetti";
+import useSound from 'use-sound';
+
+import CorrectSound from '../../correct.mp3';
+import WrongSound from '../../incorrect.mp3'
+
 // Styles
 import "./GamePage.css";
 
@@ -15,7 +21,6 @@ const GamePage = () => {
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
 
     const { gameCode } = useParams();
-    const location = useLocation();
     const navigate = useNavigate();
 
     function useQuery() {
@@ -44,6 +49,11 @@ const GamePage = () => {
     const [timerFlash, setTimerFlash] = useState(false);
 
     const [showLeaveGameModal, setShowLeaveGameModal] = useState(false);
+
+    const [playCorrect] = useSound(CorrectSound);
+    const [playWrong] = useSound(WrongSound);
+
+    
 
     useEffect(() => {
 
@@ -86,15 +96,6 @@ const GamePage = () => {
         // Listener to move to the next round
         socket.on("nextRound", (newImageIndex) => {
 
-            // if (!isModalVisible) {
-            //     setCurrentImageIndex(newImageIndex);
-            //     setIsModalVisible(true);
-            //     setPreviousGuesses([]);
-            //     setTimer(60);
-            // } else {
-            //     setNextImageIndex(newImageIndex);
-            // }
-
             setCurrentImageIndex(newImageIndex);
             setIsModalVisible(true);
             setPreviousGuesses([]);
@@ -126,7 +127,7 @@ const GamePage = () => {
             socket.off('gameOver');
           };
 
-    }, [isModalVisible, gameCode, navigate]);
+    }, [isModalVisible, gameCode, navigate, username]);
 
     const closeModal = () => {
         setIsModalVisible(false);
@@ -163,6 +164,8 @@ const GamePage = () => {
 
             setMessage("Correct!");
             setIsCorrect(true);
+            playCorrect();
+            console.log("Correct Sound Played" , playCorrect);
             setTimeout(() => setIsCorrect(false), 2000);
             setTimeout(() => setMessage(''), 2000);
 
@@ -183,6 +186,7 @@ const GamePage = () => {
         } else {
 
             setMessage("Wrong Guess! Try Again");
+            playWrong();
             setAnimationWrong(true);
             setTimeout(() => {
                 setMessage("");
@@ -235,8 +239,16 @@ const GamePage = () => {
 
     if (gameData.length === 0) {
         return (
-            <div>
-                <h1>Loading...</h1>
+            <div style={{
+                backgroundColor: "white",
+                borderRadius: "10px",
+            }}>
+                <h1 style={{
+                    textAlign: "center",
+                    fontSize: "2rem",
+                    fontFamily: "Bungee, sans-serif",
+                    color: "#ED1C24",
+                }}>NO DATA FOUND :\</h1>
             </div>
         )
     }
@@ -244,27 +256,45 @@ const GamePage = () => {
 
     return (
 
-        <div className="main-container">
+        <div className="game-container">
 
-            <div className="game-info">
-                <div className="info-item player">{username}</div>
-                <div className={`info-item timer ${timer <= 10 ? 'flash-animation' : ''}`}>{timer}s</div>
-                <div className={`info-item score ${isCorrect ? 'correct-guess' : ''}`}>Score: {score}</div>
-                <div className="info-item round">Round: {currentImageIndex+1}</div>
-                <button className="info-item leave" onClick={handleLeaveGame}>Leave Game</button>
+            <div className="header">
+
+                <div className={`header-item timer ${timer <= 10 ? 'flash-animation' : ''}`}>
+                    <span className="header-label">{timer}s</span>
+                </div>
+
+                <div className={`header-item score ${isCorrect ? 'correct-guess' : ''}`}>
+                    <span className="header-label">Score: {score}</span>
+                </div>
+
+                <div className="header-item round">
+                    <span className="header-label">Round: {currentImageIndex+1}</span>
+                </div>
+
+                <div className="header-item leave">
+                    <button className="leave-button" onClick={handleLeaveGame}>LEAVE</button>
+                </div>
+
             </div>
 
-            <div className="image-container">
+            
 
-                <div className={`message ${isCorrect ? 'correct' : ''}`}>{message}</div>
+            <div className="image-guess-container">
+
+            {isCorrect && <Confetti numberOfPieces={1000}/>}
+
+            <div className={`message ${isCorrect ? 'correct' : ''}`}>{message}</div>
 
                 {gameData.length > 0 && gameData[currentImageIndex] &&
-                    <img className={`responsive-image ${animationWrong ? 'vibrate-animation' : ''}`} src={`http://localhost:3001/${gameData[currentImageIndex].path}`} alt="Game" />
+                    <div className="image-container">
+                        <img className={`game-image ${animationWrong ? 'vibrate-animation' : ''}`} src={`http://localhost:3001/${gameData[currentImageIndex].path}`} alt="Game" />
+                    </div>
+                    // <ImageView imageUrl={`http://localhost:3001/${gameData[currentImageIndex].path}`} />
                 }
 
 
-                <div className="guess-input-area">
-
+                <div className="guess-form">
                     <input
                         className="guess-input"
                         type="text" 
@@ -274,23 +304,8 @@ const GamePage = () => {
                         onKeyPress={handleEnterKeyPress}
                     />
 
-                    <button className="guess-button" onClick={handleGuessSubmit}>Guess</button>
-
+                    <button className="guess-submit" onClick={handleGuessSubmit}>Guess</button>
                 </div>
-
-            </div>
-
-            <div className="prev-guess-panel">
-
-                <p className="prev-guess-title">Already Guessed</p>
-
-                <ul className="previous-guesses">
-
-                    {previousGuesses.map((guess, index) => (
-                        <div className="guess-item" key={index}>{guess}</div>
-                    ))}
-
-                </ul>
 
             </div>
 

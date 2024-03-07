@@ -1,8 +1,161 @@
+/* NEW CSS */
+
+.game-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: start;
+  padding: 20px;
+}
+
+.game-main {
+  display: flex;
+  flex-direction: row;
+}
+
+.game-actions {
+  display: flex;
+  justify-content: space-around;
+}
+
+
+/* Header */
+
+.header {
+  font-family: 'Bungee', sans-serif;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed; /* Fixed position to keep the header at the top */
+  top: 0; /* Align to the top */
+  left: 0; /* Align to the left */
+  z-index: 1000; /* Ensure it's above other content */
+  gap: 15px; /* Add gap between items */
+}
+
+.header-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+   /* Add margin to space out items */
+}
+
+.timer {
+  background-color: #0072BC;
+  color: white;
+  padding: 5px 8px;
+  border-radius: 5px;
+}
+
+.score {
+  background-color: #008B43;
+  color: white;
+  padding: 5px 6px;
+  border-radius: 5px;
+}
+
+.round {
+  background-color: #F7941D;
+  color: white;
+  padding: 5px 6px;
+  border-radius: 5px;
+}
+
+.leave {
+  border-radius: 5px;
+}
+
+.leave-button {
+  font-family: 'Bungee', sans-serif;
+  font-size: 1em;
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.leave-button:hover {
+  background-color: darkred;
+}
+
+/* IMAGE AND INPUT */
+
+.image-guess-container {
+  flex: 1; /* Gives the image and guess field more room to grow */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center align the children vertically */
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.game-image {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  border: 3px solid white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+.guess-form {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.guess-input {
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.guess-submit {
+  font-family: 'Bungee', sans-serif;
+  padding: 5px 15px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer; /* Pointer cursor on hover */
+  border: none; /* No border for the button */
+  background-color: #008B43; /* Background color for the button */
+  color: white; /* Text color for the button */
+}
+
+.guess-submit:hover {
+  background-color: #005328;
+}
+
+/* ==================================================================================================== */
+
+/* OLD CSS */
+
 .main-container {
   display: flex;
   height: calc(100vh - 40px);
   width: 100%;
   margin-top: 30px;
+}
+
+.image-guess-container {
+  flex: 3; /* Gives the image and guess field more room to grow */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center align the children vertically */
 }
 
 .game-info {
@@ -186,9 +339,8 @@
   font-family: 'Bungee', sans-serif;
   font-size: 1rem;
   height: 5px;
-  text-align: center;
   margin-top: 2px;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
   color: #ED1C24
 }
 
@@ -225,3 +377,10 @@
   .vibrate-animation {
     animation: vibrate 0.2s linear;
   }
+    
+    @media (max-width: 767px) {
+      /* For mobile */
+      .game-main {
+        flex-direction: column;
+      }
+    }

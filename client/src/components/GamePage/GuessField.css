@@ -1,0 +1,28 @@
+.guess-form {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.guess-input {
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+.guess-submit {
+  font-family: 'Bungee', sans-serif;
+  padding: 5px 15px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer; /* Pointer cursor on hover */
+  border: none; /* No border for the button */
+  background-color: #008B43; /* Background color for the button */
+  color: white; /* Text color for the button */
+}
+
+.guess-submit:hover {
+  background-color: #0056b3;
+}
