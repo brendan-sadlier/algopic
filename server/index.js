@@ -6,6 +6,8 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 
+const shuffleImages = require('./utils/shuffleImages');
+
 const OpenAI = require('openai');
 const dotenv = require('dotenv');
 
@@ -47,24 +49,70 @@ app.get('/game-data', (req, res) => {
     });
 });
 
+app.get('/mini-game-data/:gameCode/:imageIndex', (req, res) => {
+
+    const { gameCode, imageIndex } = req.params;
+    const gameData = JSON.parse(fs.readFileSync('game-data.json'));
+    const image = gameData[imageIndex];
+    let playerNames = Object.keys(gameLobbies[gameCode].scores);
+
+    const correctPlayerName = currentImageIndex.player;
+
+    // Filter out the correct player name from the list of players and shuffle
+    playerNames = playerNames.filter(name => name !== correctPlayerName);
+    shuffleNames(playerNames);
+
+    // Slice the list of player names to get 3 random names
+    const options = [correctPlayerName, ...playerNames.slice(0, 3)];
+    shuffleNames(options);
+
+    res.json({ path: image.path, options });
+
+});
+
+// Helper function to shuffle an array
+function shuffleNames(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// Endpoint to submit guess
+app.post('/submit-guess', (req, res) => {
+
+    const { gameCode, playerName, guessedName, imageIndex } = req.body;
+    const gameData = JSON.parse(fs.readFileSync('game-data.json'));
+    const correctPlayerName = gameData[imageIndex].player;
+
+    if (guessedName === correctPlayerName) {
+        // Correct guess
+        gameLobbies[gameCode].scores[playerName] += 1000;
+    } else {
+        // Incorrect guess
+        // No effect on score
+    }
+
+    res.json({ correct: guessedName === correctPlayerName });
+
+});
+
 app.post('/upload', upload.array('images'), async (req, res) => {
 
     try {
+        const { gameCode, playerName } = req.body;
         const files = req.files;
-        console.log(files);
         const newResults = [];
 
         for (const file of files) {
 
             // Process each file using GPT-4 Vision API
-            const fileOriginalName = file.originalname;
-            console.log('Processing file: ', fileOriginalName);
+            console.log('Processing file: ', file.originalname);
+            const filePath = 'uploads/' + file.originalname;
 
-            const filePath = 'uploads/' + fileOriginalName;
-            console.log('File path: ', filePath);
             const labels = await processImageWithGPT4Vision(filePath, 
                 "Generate 20 one word objects in this image without any explanations in the form [1. Object One - <Score>]. Give a score for each object from 1 to 10, where 1 is the easiest object to guess and 10 is the hardest to guess.");
-            newResults.push({ path: 'uploads/' + fileOriginalName, labels });
+            newResults.push({ path: filePath, player: playerName, labels });
         }
 
         // Read existing game data from file
@@ -76,12 +124,20 @@ app.post('/upload', upload.array('images'), async (req, res) => {
 
         // Merge new results with existing results
         const combinedResults = existingResults.concat(newResults);
+        // const shuffledResults = shuffleImages(combinedResults);
+
+        for (let i = combinedResults.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [combinedResults[i], combinedResults[j]] = [combinedResults[j], combinedResults[i]];
+          }
 
         try {
             fs.writeFileSync('game-data.json', JSON.stringify(combinedResults, null, 2));
         } catch (error) {
             console.log('Error writing game data: ', error);
         }
+
+        io.to(gameCode).emit('gameDataUpdated');
 
         res.send({ message: 'Success image uploaded & processes', results: newResults });
     } catch (error) {
@@ -221,7 +277,7 @@ io.on('connection', (socket) => {
             gameLobbies[gameCode] = {
                 host: username,
                 players: [username],
-                currentImageIndex: 0,
+                currentImageIndex: -1,
                 scores: { [username]: 0 }
             };
 

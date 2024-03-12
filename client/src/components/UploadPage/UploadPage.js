@@ -45,9 +45,11 @@ const UploadPage = () => {
 
         const formData = new FormData();
 
-        for (const file in selectedFiles) {
-            formData.append('images', selectedFiles[file]);
-        }
+        selectedFiles.forEach((file) => {
+          formData.append('images', file);
+        });
+
+        formData.append('playerName', username);
 
         try {
             const response = await axios.post('http://localhost:3001/upload', formData, {

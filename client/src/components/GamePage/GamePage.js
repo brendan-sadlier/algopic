@@ -53,6 +53,46 @@ const GamePage = () => {
     const [playCorrect] = useSound(CorrectSound);
     const [playWrong] = useSound(WrongSound);
 
+    // Mini-Game States
+    const [isMiniGameVisible, setIsMiniGameVisible] = useState(false);
+    const [miniGameData, setMiniGameData] = useState({ path: "", options: [] });
+
+    const fetchMiniGameData = async (imageIndex) => {
+        try {
+            const response = await axios.get(`${backendUrl}/mini-game-data/${gameCode}/${imageIndex}`);
+            setMiniGameData(response.data);
+        } catch (err) {
+            console.log("Error fetching mini-game data", err);
+        }
+    };
+
+    const handleMiniGameGuess = async (guessedName) => {
+        try {
+            const response = await axios.post(`${backendUrl}/submit-guess`, {
+                gameCode,
+                playerName: username,
+                guessedName,
+                imageIndex: currentImageIndex
+            });
+
+            setIsMiniGameVisible(false);
+            if (response.data.correct) {
+                alert('Correct Guess!');
+            } else {
+                alert('Incorrect Guess!');
+            }
+        } catch (err) {
+            console.log("Error submitting mini-game guess", err);
+        }
+    };
+
+    const shuffleImages = (images) => {
+        for (let i = images.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [images[i], images[j]] = [images[j], images[i]];
+        }
+    }
+
     
 
     useEffect(() => {
@@ -64,7 +104,12 @@ const GamePage = () => {
                 const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001'; // Fallback to a default value
                 const response = await axios.get(`${backendUrl}/game-data`);
                 console.log("Game Data: ", response.data);
-                setGameData(response.data);
+
+                if (Array.isArray(response.data)) {
+                    setGameData(response.data);
+                } else {
+                    console.log("Game Data is not an array");
+                }
 
             } catch (err) {
                 console.log("Error fetching game data", err);
@@ -72,6 +117,29 @@ const GamePage = () => {
         };
 
         fetchData();
+
+        socket.on("gameDataUpdated", () => {
+            console.log("Game Data Updated");
+            fetchData();
+        
+        });
+
+        // Listener to move to the next round
+        socket.on("nextRound", (newImageIndex) => {
+
+            // showMiniGameAtRandom();
+            setCurrentImageIndex(newImageIndex);
+            setIsModalVisible(true);
+            setPreviousGuesses([]);
+            setTimer(60); // Reset timer here for the new round
+
+        });
+
+        return () => {
+            socket.off('gameDataUpdated');
+            socket.off('nextRound');
+        }
+
     }, []);
 
 
@@ -93,16 +161,6 @@ const GamePage = () => {
 
         })
 
-        // Listener to move to the next round
-        socket.on("nextRound", (newImageIndex) => {
-
-            setCurrentImageIndex(newImageIndex);
-            setIsModalVisible(true);
-            setPreviousGuesses([]);
-            setTimer(60); // Reset timer here for the new round
-
-        });
-
         socket.on("startNewRound", () => {
             setIsModalVisible(false);
             setTimer(60);
@@ -122,7 +180,6 @@ const GamePage = () => {
 
           return () => {
             socket.off('timerUpdate');
-            socket.off('nextRound');
             socket.off('roundEnded');
             socket.off('gameOver');
           };
@@ -199,6 +256,15 @@ const GamePage = () => {
         setPreviousGuesses(previousGuesses => [...previousGuesses, lowerCaseGuess]);
         setCurrentGuess("");
     }
+
+    const showMiniGameAtRandom = () => {
+
+        // 25% chance to show the mini-game
+        if (Math.random() < 0.5) {
+            setIsMiniGameVisible(true);
+            fetchMiniGameData();
+        }
+    };
 
     // Functionality to Allow User to Submit By Pressing Enter
     const handleEnterKeyPress = (event) => {
@@ -309,6 +375,20 @@ const GamePage = () => {
                 </div>
 
             </div>
+
+            {/* {
+                isMiniGameVisible && (
+                    <div className="mini-game">
+                        <h3>Whose image is this?</h3>
+                        <img src={miniGameData.path} alt="Mini-game prompt" />
+                        {miniGameData.options.map((option, index) => (
+                            <button key={index} onClick={() => handleMiniGameGuess(option)}>
+                                {option}
+                            </button>
+                        ))}
+                    </div>
+                )
+            } */}
 
             <RoundOverModal 
                 isVisible={isModalVisible}
