@@ -16,6 +16,8 @@ const UploadPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
     const { gameCode } = useParams();
 
     function useQuery() {
@@ -52,7 +54,7 @@ const UploadPage = () => {
         formData.append('playerName', username);
 
         try {
-            const response = await axios.post('http://localhost:3001/upload', formData, {
+            const response = await axios.post(backendUrl+"/upload", formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

@@ -18,7 +18,7 @@ import "./GamePage.css";
 
 const GamePage = () => {
 
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
 
     const { gameCode } = useParams();
     const navigate = useNavigate();
@@ -101,8 +101,8 @@ const GamePage = () => {
 
             try {
 
-                const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001'; // Fallback to a default value
-                const response = await axios.get(`${backendUrl}/game-data`);
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001'; // Fallback to a default value
+                const response = await axios.get(backendUrl+"/game-data");
                 console.log("Game Data: ", response.data);
 
                 if (Array.isArray(response.data)) {
@@ -120,7 +120,6 @@ const GamePage = () => {
 
         socket.on("gameDataUpdated", () => {
             console.log("Game Data Updated");
-            fetchData();
         
         });
 
@@ -320,6 +319,7 @@ const GamePage = () => {
         )
     }
 
+    console.log(`${backendUrl}/${gameData[currentImageIndex].path}`);
 
     return (
 
@@ -355,7 +355,7 @@ const GamePage = () => {
 
                 {gameData.length > 0 && gameData[currentImageIndex] &&
                     <div className="image-container">
-                        <img className={`game-image ${animationWrong ? 'vibrate-animation' : ''}`} src={`http://localhost:3001/${gameData[currentImageIndex].path}`} alt="Game" />
+                        <img key={currentImageIndex} className={`game-image ${animationWrong ? 'vibrate-animation' : ''}`} src={`${backendUrl}/${gameData[currentImageIndex].path}`} alt="Game" />
                     </div>
                     // <ImageView imageUrl={`http://localhost:3001/${gameData[currentImageIndex].path}`} />
                 }

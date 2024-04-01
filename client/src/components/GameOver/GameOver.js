@@ -7,7 +7,7 @@ import './GameOver.css'
 
 const GameOver = () => {
 
-  const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+  const backendUrl = process.env.REACT_APP_BACKEND_URL
 
 
     const location = useLocation();

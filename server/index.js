@@ -255,8 +255,8 @@ let gameLobbies = {};
 
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:3000',
-        methods: ['GET', 'POST']
+        origin: "192.168.1.201:3001",
+        methods: ['GET', 'POST', 'PUT', 'DELETE']
     }
 }, { transports: ['websocket'], upgrade: false });
 
@@ -277,7 +277,7 @@ io.on('connection', (socket) => {
             gameLobbies[gameCode] = {
                 host: username,
                 players: [username],
-                currentImageIndex: -1,
+                currentImageIndex: 0,
                 scores: { [username]: 0 }
             };
 
@@ -482,6 +482,6 @@ function getMimeType (filePath) {
 }
 
 // Start Server
-server.listen(3001, () => {
+server.listen(3001, '0.0.0.0', () => {
     console.log(`Listening on port 3001`)
 });
