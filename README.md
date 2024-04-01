@@ -7,7 +7,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
+  <a href="https://csgitlab.ucd.ie/brendan-sadlier/fyp_algopic">
     <img src="/images/AlgoPic.png" alt="Logo" height="100">
   </a>
 
@@ -136,7 +136,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 [license-url]: https://csgitlab.ucd.ie/brendan-sadlier/fyp_algopic/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=0A66C2
 [linkedin-url]: https://www.linkedin.com/in/brendan-sadlier-24672823a
-[product-screenshot]: https://placehold.co/1000x600?text=Product+Screenshot+Here
+[product-screenshot]: /images/GameScreenshot.png
 [Node.js]: https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=nextdotjs&logoColor=white
 [Node-url]: https://nodejs.org/en
 [React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
