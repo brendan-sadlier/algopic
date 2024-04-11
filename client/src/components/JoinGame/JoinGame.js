@@ -42,7 +42,7 @@ const JoinGame = () => {
                     type="text" 
                     placeholder="Game Code" 
                     value={gameCode} 
-                    onChange={(e) => setGameCode(e.target.value)} 
+                    onChange={(e) => setGameCode(e.target.value.toUpperCase)} 
                 />
         
         <button className='join-game-button' onClick={handleJoinGameClick}>Join Game</button>
