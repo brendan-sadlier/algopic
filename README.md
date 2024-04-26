@@ -16,15 +16,9 @@
   <p align="center">
     Connect, Play and Make Friends at University
     <br />
+    Brendan Sadlier - 20402884
     <strong>Final Year Project for BSc in Computer Science at University College Dublin</strong>
     <br />
-    <br />
-    <a href="https://csgitlab.ucd.ie/brendan-sadlier/fyp_algopic">View Demo</a>
-    ·
-    <a href="https://csgitlab.ucd.ie/brendan-sadlier/fyp_algopic/-/issues">Report Bug</a>
-    ·
-    <a href="https://csgitlab.ucd.ie/brendan-sadlier/fyp_algopic/-/issues">Request Feature</a>
-  </p>
 </div>
 
 <!-- TABLE OF CONTENTS -->
