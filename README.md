@@ -16,7 +16,6 @@
   <p align="center">
     Connect, Play and Make Friends at University
     <br />
-    Brendan Sadlier - 20402884
     <strong>Final Year Project for BSc in Computer Science at University College Dublin</strong>
     <br />
 </div>
